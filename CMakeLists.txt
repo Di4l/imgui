@@ -5,6 +5,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project("ImGui" VERSION 1.0)
 
+option(IMGUI_WITH_BACKENDS "Compile backends" ON)
+
 # Add sources to the project
 file(GLOB IMGUI_HEADERS
 		imconfig.h
@@ -24,37 +26,13 @@ source_group("Header Files" FILES ${IMGUI_HEADERS})
 source_group("Source Files" FILES ${IMGUI_SOURCES})
 source_group("CMake Files" FILES CMakeLists.txt)
 
-# Add link paths and includes
-if(BUILD_WITH_SHARED_LIBS)
-	add_library (ImGui SHARED ${IMGUI_SOURCES} ${IMGUI_HEADERS})
-#	target_link_libraries(ImGui PRIVATE soci_sqlite3)
-#	target_link_libraries(fileIndexer PRIVATE SQLite3)
-
-#	add_dependencies(ImGui soci_core soci_sqlite3)
-endif()
-
-if(BUILD_WITH_STATIC_LIBS)
-	add_library (ImGui_static STATIC ${IMGUI_SOURCES} ${IMGUI_HEADERS})
-#	target_link_libraries(fileIndexer PRIVATE soci_sqlite3_static)
-#	target_link_libraries(fileIndexer PRIVATE SQLite3_static)
-
-#	add_dependencies(fileIndexer soci_core_static soci_sqlite3_static)
-endif()
+add_library (ImGui STATIC ${IMGUI_SOURCES} ${IMGUI_HEADERS})
 
 # TODO: Agregue pruebas y destinos de instalación si es necesario.
 
 include(GNUInstallDirs)
 
 install(FILES ${IMGUI_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/imgui)
-
-if(BUILD_WITH_SHARED_LIBS)
-	install(TARGETS ImGui
-		EXPORT ImGui
-		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-		)
-endif()
 
 if(BUILD_WITH_STATIC_LIBS)
 	install(TARGETS ImGui_static
@@ -63,4 +41,8 @@ if(BUILD_WITH_STATIC_LIBS)
 		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 		)
+endif()
+
+if(IMGUI_WITH_BACKENDS)
+	add_subdirectory(backends)
 endif()
