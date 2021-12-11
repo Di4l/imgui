@@ -19,7 +19,6 @@ file(GLOB IMGUI_HEADERS
 		imstb_truetype.h)
 file(GLOB IMGUI_SOURCES
 		imgui.cpp
-#		imgui_demo.cpp
 		imgui_draw.cpp
 		imgui_tables.cpp
 		imgui_widgets.cpp)
@@ -45,15 +44,30 @@ add_library (ImGui STATIC ${IMGUI_SOURCES} ${IMGUI_HEADERS})
 target_include_directories(ImGui PUBLIC
 		"${PROJECT_SOURCE_DIR}"
 		"${PROJECT_SOURCE_DIR}/backends"
-		"${PROJECT_SOURCE_DIR}/../sdl/include"
-		"${CMAKE_INSTALL_PREFIX}/../vendor/soci/include")
+		"${PROJECT_SOURCE_DIR}/../sdl2/include"
+		"${PROJECT_SOURCE_DIR}/../sdl_image/include"
+		"${CMAKE_INSTALL_PREFIX}/../../vendor/soci/include")
+target_link_directories(ImGui PUBLIC
+						"${CMAKE_INSTALL_LIBDIR}"
+						"${PROJECT_SOURCE_DIR}/../sdl2/lib/${FT_LIB_PATH_PREFIX}"
+						"${PROJECT_SOURCE_DIR}/../sdl_image/lib/${FT_LIB_PATH_PREFIX}"
+						)
+target_link_libraries(ImGui PRIVATE SDL2 SDL2_image)
+
 if(IMGUI_WITH_DEMO)
-	target_compile_definitions(fileIndexer PUBLIC _IMGUI_WITH_DEMO_)
+	target_compile_definitions(ImGui PUBLIC _IMGUI_WITH_DEMO_)
 endif()
+
+file(GLOB SDL_BINARIES 
+			"${PROJECT_SOURCE_DIR}/../sdl2/lib/${FT_LIB_PATH_PREFIX}/SDL2.dll"
+			"${PROJECT_SOURCE_DIR}/../sdl_image/lib/${FT_LIB_PATH_PREFIX}/*.dll"
+			)
 
 include(GNUInstallDirs)
 
 install(FILES ${IMGUI_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/imgui)
+install(FILES ${SDL_BINARIES} DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 install(TARGETS ImGui
 	EXPORT ImGui
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
